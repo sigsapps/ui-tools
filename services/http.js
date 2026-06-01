@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { utils, eventbroadcaster } from '../services.js'
 
+const DEFAULT_REQUEST_TIMEOUT = 15000;
 var headers = {};
 var isExternal = false;
 export default {
@@ -24,7 +25,8 @@ export default {
     }
 
     var reqConf = {
-      headers: { ...headers }
+      headers: { ...headers },
+      timeout: DEFAULT_REQUEST_TIMEOUT
     };
 
     headers = {};
@@ -50,7 +52,8 @@ export default {
     url = `${isExternal ? '' : process.env.API}${url}`;
 
     var reqConf = {
-      headers: { ...headers }
+      headers: { ...headers },
+      timeout: DEFAULT_REQUEST_TIMEOUT
     };
 
     headers = {};
@@ -76,7 +79,8 @@ export default {
     url = `${isExternal ? '' : process.env.API}${url}`;
 
     var reqConf = {
-      headers: { ...headers }
+      headers: { ...headers },
+      timeout: DEFAULT_REQUEST_TIMEOUT
     };
 
     headers = {};
@@ -108,7 +112,8 @@ export default {
     }
 
     var reqConf = {
-      headers: { ...headers }
+      headers: { ...headers },
+      timeout: DEFAULT_REQUEST_TIMEOUT
     };
 
     headers = {};
