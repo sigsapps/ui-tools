@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { normalizeFields } from 'src/services/textNormalization';
+
 export default {
   name: 'components-common-addressinfo',
 
@@ -65,6 +67,7 @@ export default {
     hideMap: Boolean,
     readonly: Boolean,
     showTitle: Boolean,
+    normalizeText: Boolean,
     wrapFields: Boolean,
     modelValue: {
       type: Object,
@@ -125,6 +128,17 @@ export default {
       this.$emit("update:model-value", this.factory);
     },
 
+    normalizeAddressFields() {
+      if (!this.normalizeText) return false;
+
+      return normalizeFields(this.input, [
+        'ds_addressstreet',
+        'ds_addresscomplement',
+        'ds_addressneighborhood',
+        'ds_addresscity',
+      ]);
+    },
+
     async getAddressByZipcode() {
       var address = await this.$utils.getAddressByZipCode(this.input.ds_addresszipcode, false);
       if (address === null) return;
@@ -149,6 +163,7 @@ export default {
   watch: {
     input: {
       handler() {
+        if (this.normalizeAddressFields()) return;
         this.updModel();
       },
       deep: true,

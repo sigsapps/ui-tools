@@ -31,7 +31,7 @@
     <!-- Input textarea: -->
     <q-input v-if="type == 'textarea'" type="textarea" square filled hide-bottom-space :ref="inputRefId" :label="Label"
       :clearable="clearable" :dense="dense" :disable="disable" :readonly="readonly" :maxlength="maxlength" :hint="hint"
-      :class="`full-width bg-${BgColor ? BgColor : 'white'}`" v-model="value" :error="Error"
+      :rows="Rows" :class="`full-width bg-${BgColor ? BgColor : 'white'}`" v-model="value" :error="Error"
       @focus="() => $emit('focus')" @update:model-value="updModelValue" @click="inputClicked" :error-message="ErrorMsg">
       <template v-slot:append>
         <slot name="buttons"></slot>
@@ -173,6 +173,7 @@ export default {
     disable: Boolean,
     maxlength: String,
     readonly: Boolean,
+    Rows: [String, Number],
     // Date
     dateOptions: { type: [Array, Function] },
     todayBtn: Boolean,
