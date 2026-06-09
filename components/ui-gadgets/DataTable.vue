@@ -659,6 +659,8 @@ export default {
       delete params.$page;
       delete params.$limit;
 
+      if (this.BeforeLoad) await this.BeforeLoad(params);
+
       const response = await this.$http.get(this.DataURL, params);
       this.fullData = response.data;
     },
