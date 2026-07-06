@@ -64,26 +64,51 @@ export default {
       firstTime: null,
       lastTime: null,
       date: null,
+      // Guards against a reactive feedback loop: applying an external value below sets date/firstTime/
+      // lastTime, which would otherwise re-trigger updateModelValue() and re-emit a (new but equivalent)
+      // object, which would come back around as a "changed" modelValue and re-apply forever.
+      isApplyingExternalValue: false,
     }
   },
 
   watch: {
     date() {
+      if (this.isApplyingExternalValue) return;
       this.updateModelValue();
     },
 
     firstTime() {
+      if (this.isApplyingExternalValue) return;
       this.updateModelValue();
     },
 
     lastTime() {
+      if (this.isApplyingExternalValue) return;
       this.updateModelValue();
+    },
+
+    // Keeps the calendar popup in sync whenever the bound value changes - including when it
+    // arrives asynchronously (e.g. an edit screen loading the entity's data after this component
+    // has already mounted). Without this, the popup's internal state stays stuck on whatever it
+    // was initialized with, and can even overwrite a value the user just picked.
+    modelValue: {
+      immediate: true,
+      handler(v) {
+        this.applyValue(v ?? this.Default ?? null);
+      }
     },
   },
 
   methods: {
     setDefault() {
-      var v = this.Default ?? null;
+      this.applyValue(this.Default ?? null);
+    },
+
+    applyValue(v) {
+      // q-date works with a 'YYYY/MM/DD' mask internally, while values coming from the model
+      // (loaded entities, or this component's own emitted values) use 'YYYY-MM-DD'.
+      const toSlash = (d) => (d ? d.replaceAll('-', '/') : d);
+
       var date;
       var firstTime;
       var lastTime;
@@ -101,20 +126,20 @@ export default {
           if (!!v.from) {
             if (v.from.includes(':')) {
               let arr = v.from.split(' ');
-              date.from = arr[0];
+              date.from = toSlash(arr[0]);
               firstTime = arr[1];
             } else {
-              date.from = v.from;
+              date.from = toSlash(v.from);
             }
           }
 
           if (!!v.to) {
             if (v.to.includes(':')) {
               let arr = v.to.split(' ');
-              date.to = arr[0];
+              date.to = toSlash(arr[0]);
               lastTime = arr[1];
             } else {
-              date.to = v.to;
+              date.to = toSlash(v.to);
             }
           }
         }
@@ -123,10 +148,10 @@ export default {
         else {
           if (v.includes(':')) {
             let arr = v.split(' ');
-            date = arr[0];
+            date = toSlash(arr[0]);
             firstTime = arr[1];
           } else {
-            date = v;
+            date = toSlash(v);
           }
         }
       } else {
@@ -135,9 +160,11 @@ export default {
         lastTime = null;
       }
 
+      this.isApplyingExternalValue = true;
       this.date = date;
       this.firstTime = firstTime;
       this.lastTime = lastTime;
+      this.$nextTick(() => { this.isApplyingExternalValue = false; });
 
       if (!!this.Default && firstTime) {
         this.defaultFirstTime = firstTime;
@@ -245,12 +272,6 @@ export default {
       else return null;
     },
   },
-
-  mounted() {
-    setTimeout(() => {
-      this.setDefault();
-    }, 200);
-  }
 
 }
 </script>
