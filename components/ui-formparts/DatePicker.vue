@@ -10,11 +10,12 @@
       <q-icon v-else clickable @click="$emit('focus');" name="fas fa-calendar-alt" color="primary"
         class="cursor-pointer">
         <q-tooltip>Selecionar {{ range ? 'Período' : 'Data' }}</q-tooltip>
-        <q-popup-proxy cover transition-show="scale" transition-hide="scale" style="margin: 0;">
+        <q-popup-proxy cover transition-show="scale" transition-hide="scale" style="margin: 0;"
+          @hide="finalizePendingSingleDay">
           <q-card>
             <q-date :emit-immediately="!range" :range="range" :today-btn="todayBtn" :options="dateOptions"
               :navigation-min-year-month="minDatePage" :navigation-max-year-month="maxDatePage" v-model="date"
-              @update:model-value="updateModelValue()">
+              @update:model-value="updateModelValue()" @range-start="onRangeStart" @range-end="onRangeEnd">
             </q-date>
             <div v-if="withTime" class="q-pa-sm">
               <TimePicker :withSeconds="withSeconds" dense :Label="range ? 'De:' : 'Hora'" v-model="firstTime"
@@ -68,6 +69,11 @@ export default {
       // lastTime, which would otherwise re-trigger updateModelValue() and re-emit a (new but equivalent)
       // object, which would come back around as a "changed" modelValue and re-apply forever.
       isApplyingExternalValue: false,
+      // In range mode, q-date needs a second click on a day to complete the selection - a
+      // single click alone never emits anything and leaves the field blank. This tracks that
+      // first click so we can finalize it as a one-day range if the popup closes before a
+      // second click happens.
+      pendingRangeStart: null,
     }
   },
 
@@ -105,6 +111,9 @@ export default {
     },
 
     applyValue(v) {
+      // An external value takes precedence over any in-progress range click.
+      this.pendingRangeStart = null;
+
       // q-date works with a 'YYYY/MM/DD' mask internally, while values coming from the model
       // (loaded entities, or this component's own emitted values) use 'YYYY-MM-DD'.
       const toSlash = (d) => (d ? d.replaceAll('-', '/') : d);
@@ -231,6 +240,23 @@ export default {
           this.defaultLastTime = this.lastTime ? this.lastTime : '23:59:59';
 
       }
+    },
+
+    onRangeStart(day) {
+      const pad = (n) => String(n).padStart(2, '0');
+      this.pendingRangeStart = `${day.year}/${pad(day.month)}/${pad(day.day)}`;
+    },
+
+    onRangeEnd() {
+      // A second click completed the range normally - nothing left to finalize.
+      this.pendingRangeStart = null;
+    },
+
+    finalizePendingSingleDay() {
+      if (!this.range || !this.pendingRangeStart) return;
+
+      this.date = { from: this.pendingRangeStart, to: this.pendingRangeStart };
+      this.pendingRangeStart = null;
     }
   },
 
