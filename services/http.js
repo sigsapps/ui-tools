@@ -48,12 +48,13 @@ export default {
     return reqPromise;
   },
 
-  post: function (url, data) {
+  post: function (url, data, options = {}) {
     url = `${isExternal ? '' : process.env.API}${url}`;
 
     var reqConf = {
       headers: { ...headers },
-      timeout: DEFAULT_REQUEST_TIMEOUT
+      timeout: DEFAULT_REQUEST_TIMEOUT,
+      ...options
     };
 
     headers = {};
