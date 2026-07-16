@@ -4,7 +4,7 @@
     <q-input v-if="type == 'text' || type == null" type="text" square filled hide-bottom-space :ref="inputRefId"
       :label="Label" :clearable="clearable" :dense="dense" :disable="disable" :readonly="readonly" :unmasked-value="unmaskedValue"
       :maxlength="maxlength" :mask="Mask" :reverse-fill-mask="ReverseFillMask" :fill-mask="FillMask" :hint="hint"
-      :class="`full-width bg-${BgColor ? BgColor : 'white'}`" v-model="value" :error="Error" :error-message="ErrorMsg"
+      :inputmode="InputMode" :class="`full-width bg-${BgColor ? BgColor : 'white'}`" v-model="value" :error="Error" :error-message="ErrorMsg"
       @focus="() => $emit('focus')" @update:model-value="updModelValue" @click="inputClicked">
       <template v-slot:append>
         <slot name="buttons"></slot>
@@ -201,6 +201,7 @@ export default {
     min: String,
     // Mask
     Mask: String,
+    InputMode: String,
     ReverseFillMask: Boolean,
     FillMask: {
       type: [String, Boolean],
