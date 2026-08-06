@@ -2,7 +2,7 @@
   <div :class="ignorePadding ? '' : (dense ? 'q-pa-xs' : 'q-pa-sm')">
     <!-- Input text: -->
     <q-input v-if="type == 'text' || type == null" type="text" square filled hide-bottom-space :ref="inputRefId"
-      :label="Label" :clearable="clearable" :dense="dense" :disable="disable" :readonly="readonly" :unmasked-value="unmaskedValue"
+      :label="Label" :prefix="Prefix" :clearable="clearable" :dense="dense" :disable="disable" :readonly="readonly" :unmasked-value="unmaskedValue"
       :maxlength="maxlength" :mask="Mask" :reverse-fill-mask="ReverseFillMask" :fill-mask="FillMask" :hint="hint"
       :inputmode="InputMode" :class="`full-width bg-${BgColor ? BgColor : 'white'}`" v-model="value" :error="Error" :error-message="ErrorMsg"
       @focus="() => $emit('focus')" @update:model-value="updModelValue" @click="inputClicked">
@@ -201,6 +201,7 @@ export default {
     min: String,
     // Mask
     Mask: String,
+    Prefix: String,
     InputMode: String,
     ReverseFillMask: Boolean,
     FillMask: {

@@ -451,6 +451,24 @@ export default {
   /////////////////////
   // Format Functions:
   /////////////////////
+  // Converte um valor decimal (ex: 1500.5, vindo da API) pro formato que o InputField com
+  // Mask + ReverseFillMask + unmaskedValue espera receber (string de centavos, ex: "150050"),
+  // pra exibir já formatado como moeda BR ao carregar um cadastro existente.
+  toCurrencyMaskValue(value) {
+    if (value === null || typeof value === 'undefined' || value === '') return null;
+    return Math.round(Number(value) * 100).toString();
+  },
+
+  // Converte de volta o valor cru emitido por um InputField com Mask + ReverseFillMask +
+  // unmaskedValue (string de centavos) pra decimal (ex: "150050" -> 1500.5), pronto pra
+  // enviar à API.
+  fromCurrencyMaskValue(value) {
+    if (value === null || typeof value === 'undefined' || value === '') return null;
+    const digits = String(value).replace(/\D/g, '');
+    if (!digits) return null;
+    return Number((Number(digits) / 100).toFixed(2));
+  },
+
   formatMoney(value) {
     const moneyFormatter = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
