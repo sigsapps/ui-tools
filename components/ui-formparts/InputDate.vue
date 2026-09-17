@@ -52,21 +52,28 @@ export default {
   },
 
   watch: {
-    modelValue(val) {
-      if (val && val.length >= 10) {
-        let date = val.split(' ')[0];
-        let time = val.split(' ')[1] ?? null;
+    modelValue: {
+      // immediate: sem isso, um campo que já nasce com valor (ex: linha de uma tabela criada
+      // via v-if depois que os dados já chegaram, como o preview de parcelas) nunca dispara o
+      // watch - o valor interno "value" fica null e o campo aparece vazio mesmo com modelValue
+      // preenchido, apesar do dado estar correto por trás.
+      immediate: true,
+      handler(val) {
+        if (val && val.length >= 10) {
+          let date = val.split(' ')[0];
+          let time = val.split(' ')[1] ?? null;
 
-        // If typing mode is enabled, we set the modelValue to the current date, but reverting from 'yyyy-mm-dd' to 'dd/mm/yyyy':
-        let dateParts = date.split('-');
-        this.value = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+          // If typing mode is enabled, we set the modelValue to the current date, but reverting from 'yyyy-mm-dd' to 'dd/mm/yyyy':
+          let dateParts = date.split('-');
+          this.value = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
 
-        if (this.withTime) {
-          this.value += ` ${time ?? '00:00:00'}`;
+          if (this.withTime) {
+            this.value += ` ${time ?? '00:00:00'}`;
+          }
+        } else {
+          // Reset the typing mode options when closed
+          this.value = null;
         }
-      } else {
-        // Reset the typing mode options when closed
-        this.value = null;
       }
     },
 

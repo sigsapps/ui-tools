@@ -52,8 +52,14 @@ export default {
 
   watch: {
     modelValue: {
+      // v pode chegar null/undefined quando o formulário pai limpa o campo (ex: reset após
+      // importar um arquivo) - atribuir direto quebra o template, que lê fileData.name/size.
       handler(v) {
-        this.fileData = v;
+        if (v) {
+          this.fileData = v;
+        } else {
+          this.clearFileData();
+        }
       },
       deep: true
     },
