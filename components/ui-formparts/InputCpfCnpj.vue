@@ -78,7 +78,11 @@ export default {
   },
 
   mounted() {
-    if (this.Default) {
+    // O watcher de modelValue só dispara em MUDANÇA - se o campo for montado já com valor
+    // (ex.: dentro de um v-if que só abre depois do carregamento), ele ficava vazio.
+    if (this.modelValue) {
+      this.value = this.modelValue;
+    } else if (this.Default) {
       this.value = this.Default;
     }
   }
